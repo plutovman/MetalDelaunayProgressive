@@ -22,8 +22,8 @@ class ViewController: UIViewController, DelaunayTriangulationMetalViewDelegate {
     delaunayView = DelaunayTriangulationMetalView(frame: UIScreen.main.bounds)
     delaunayView.MetalViewDelegate = self
     
-    delaunayView.enableSetNeedsDisplay = true // needed so we can call setNeedsDisplay() locally to force a display update
-    delaunayView.isPaused = true  // may not be needed, as the enableSetNeedsDisplay flag above seems to pause screen activity upon start anyway
+    //delaunayView.enableSetNeedsDisplay = true // needed so we can call setNeedsDisplay() locally to force a display update
+    //delaunayView.isPaused = true  // may not be needed, as the enableSetNeedsDisplay flag above seems to pause screen activity upon start anyway
     
     view.addSubview(delaunayView)
     
@@ -34,7 +34,11 @@ class ViewController: UIViewController, DelaunayTriangulationMetalViewDelegate {
   override func didReceiveMemoryWarning() {
     super.didReceiveMemoryWarning()
     // Dispose of any resources that can be recreated.
-  }
+  } // end of override func didReceiveMemoryWarning()
+  
+  override func viewDidLayoutSubviews(){
+    delaunayView.frame = view.bounds
+  } // end of override func viewDidLayoutSubviews()
   
   // MARK: - Delegate methods
   

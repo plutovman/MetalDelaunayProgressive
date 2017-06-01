@@ -6,8 +6,8 @@
 //  Copyright © 2017 vladimir sierra. All rights reserved.
 //
 
-struct TriangleRef {
-  let vertex1: Int
-  let vertex2: Int
-  let vertex3: Int
+public struct TriangleRef {
+  let index1: Int
+  let index2: Int
+  let index3: Int
 }

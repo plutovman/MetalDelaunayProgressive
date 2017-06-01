@@ -29,6 +29,14 @@ extension CGFloat {
   
 }
 
+extension Float {
+  static func random(_ min: Float, _ max: Float) -> Float {
+    return Float(Double.random(Double(min), Double(max)))
+  }
+}
+
+
+
 extension UIColor {
   func randomColor() -> UIColor {
     let hue = CGFloat( Double.random() )  // 0.0 to 1.0
