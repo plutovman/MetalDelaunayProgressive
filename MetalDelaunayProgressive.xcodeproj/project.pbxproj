@@ -14,6 +14,16 @@
 		E7CA93AB1EDFCEF000C8C175 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E7CA93A91EDFCEF000C8C175 /* LaunchScreen.storyboard */; };
 		E7CA93B61EDFCEF000C8C175 /* MetalDelaunayProgressiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93B51EDFCEF000C8C175 /* MetalDelaunayProgressiveTests.swift */; };
 		E7CA93C11EDFCEF000C8C175 /* MetalDelaunayProgressiveUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93C01EDFCEF000C8C175 /* MetalDelaunayProgressiveUITests.swift */; };
+		E7CA93D31EDFD14600C8C175 /* Circumcircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93CE1EDFD14600C8C175 /* Circumcircle.swift */; };
+		E7CA93D41EDFD14600C8C175 /* Delaunay.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93CF1EDFD14600C8C175 /* Delaunay.swift */; };
+		E7CA93D51EDFD14600C8C175 /* Edge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93D01EDFD14600C8C175 /* Edge.swift */; };
+		E7CA93D61EDFD14600C8C175 /* Triangle2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93D11EDFD14600C8C175 /* Triangle2D.swift */; };
+		E7CA93D71EDFD14600C8C175 /* Vertex2DSimple.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93D21EDFD14600C8C175 /* Vertex2DSimple.swift */; };
+		E7CA93DA1EDFD2F700C8C175 /* TriangleRef.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93D91EDFD2F700C8C175 /* TriangleRef.swift */; };
+		E7CA93DC1EDFD3EC00C8C175 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93DB1EDFD3EC00C8C175 /* Utilities.swift */; };
+		E7CA93DE1EDFD59000C8C175 /* Vertex3DColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93DD1EDFD59000C8C175 /* Vertex3DColor.swift */; };
+		E7CA93E01EDFDB5000C8C175 /* DelaunayTriangulationMetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93DF1EDFDB5000C8C175 /* DelaunayTriangulationMetalView.swift */; };
+		E7CA93E21EDFF28300C8C175 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93E11EDFF28300C8C175 /* Shaders.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +57,16 @@
 		E7CA93BC1EDFCEF000C8C175 /* MetalDelaunayProgressiveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalDelaunayProgressiveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7CA93C01EDFCEF000C8C175 /* MetalDelaunayProgressiveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDelaunayProgressiveUITests.swift; sourceTree = "<group>"; };
 		E7CA93C21EDFCEF000C8C175 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E7CA93CE1EDFD14600C8C175 /* Circumcircle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Circumcircle.swift; sourceTree = "<group>"; };
+		E7CA93CF1EDFD14600C8C175 /* Delaunay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Delaunay.swift; sourceTree = "<group>"; };
+		E7CA93D01EDFD14600C8C175 /* Edge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Edge.swift; sourceTree = "<group>"; };
+		E7CA93D11EDFD14600C8C175 /* Triangle2D.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Triangle2D.swift; sourceTree = "<group>"; };
+		E7CA93D21EDFD14600C8C175 /* Vertex2DSimple.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex2DSimple.swift; sourceTree = "<group>"; };
+		E7CA93D91EDFD2F700C8C175 /* TriangleRef.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TriangleRef.swift; sourceTree = "<group>"; };
+		E7CA93DB1EDFD3EC00C8C175 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		E7CA93DD1EDFD59000C8C175 /* Vertex3DColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex3DColor.swift; sourceTree = "<group>"; };
+		E7CA93DF1EDFDB5000C8C175 /* DelaunayTriangulationMetalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DelaunayTriangulationMetalView.swift; sourceTree = "<group>"; };
+		E7CA93E11EDFF28300C8C175 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +119,9 @@
 			children = (
 				E7CA93A01EDFCEF000C8C175 /* AppDelegate.swift */,
 				E7CA93A21EDFCEF000C8C175 /* ViewController.swift */,
+				E7CA93DF1EDFDB5000C8C175 /* DelaunayTriangulationMetalView.swift */,
+				E7CA93E11EDFF28300C8C175 /* Shaders.metal */,
+				E7CA93D81EDFD15200C8C175 /* Delaunay */,
 				E7CA93A41EDFCEF000C8C175 /* Main.storyboard */,
 				E7CA93A71EDFCEF000C8C175 /* Assets.xcassets */,
 				E7CA93A91EDFCEF000C8C175 /* LaunchScreen.storyboard */,
@@ -123,6 +146,21 @@
 				E7CA93C21EDFCEF000C8C175 /* Info.plist */,
 			);
 			path = MetalDelaunayProgressiveUITests;
+			sourceTree = "<group>";
+		};
+		E7CA93D81EDFD15200C8C175 /* Delaunay */ = {
+			isa = PBXGroup;
+			children = (
+				E7CA93CE1EDFD14600C8C175 /* Circumcircle.swift */,
+				E7CA93CF1EDFD14600C8C175 /* Delaunay.swift */,
+				E7CA93D01EDFD14600C8C175 /* Edge.swift */,
+				E7CA93D91EDFD2F700C8C175 /* TriangleRef.swift */,
+				E7CA93D11EDFD14600C8C175 /* Triangle2D.swift */,
+				E7CA93D21EDFD14600C8C175 /* Vertex2DSimple.swift */,
+				E7CA93DD1EDFD59000C8C175 /* Vertex3DColor.swift */,
+				E7CA93DB1EDFD3EC00C8C175 /* Utilities.swift */,
+			);
+			name = Delaunay;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -262,8 +300,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7CA93E21EDFF28300C8C175 /* Shaders.metal in Sources */,
+				E7CA93DE1EDFD59000C8C175 /* Vertex3DColor.swift in Sources */,
+				E7CA93D41EDFD14600C8C175 /* Delaunay.swift in Sources */,
+				E7CA93D31EDFD14600C8C175 /* Circumcircle.swift in Sources */,
+				E7CA93E01EDFDB5000C8C175 /* DelaunayTriangulationMetalView.swift in Sources */,
 				E7CA93A31EDFCEF000C8C175 /* ViewController.swift in Sources */,
+				E7CA93D71EDFD14600C8C175 /* Vertex2DSimple.swift in Sources */,
+				E7CA93D61EDFD14600C8C175 /* Triangle2D.swift in Sources */,
+				E7CA93D51EDFD14600C8C175 /* Edge.swift in Sources */,
+				E7CA93DC1EDFD3EC00C8C175 /* Utilities.swift in Sources */,
 				E7CA93A11EDFCEF000C8C175 /* AppDelegate.swift in Sources */,
+				E7CA93DA1EDFD2F700C8C175 /* TriangleRef.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
