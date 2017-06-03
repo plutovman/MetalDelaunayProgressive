@@ -66,7 +66,7 @@ class ViewController: UIViewController, DelaunayTriangulationMetalViewDelegate {
   } // end of func touchesMoved()
  
   
-  // MARK: - Delegate methods
+  // MARK: - Misc methods
   
   func triangulateLogic(touchPoint: CGPoint){
     let pt2DDevice = touchPoint // convert touch to Vertex2DSimple
@@ -78,7 +78,7 @@ class ViewController: UIViewController, DelaunayTriangulationMetalViewDelegate {
     
     
     if triangleRef.index0 == 0 &&  triangleRef.index1 == 0 && triangleRef.index2 == 0 {
-      print ("......no containing triangle found.  Doing nothing")
+      print ("...[ViewController]: no containing triangle found.  Dismissing point.")
     } else {
       // note that if the vertex already exists in delaunayView's point cloud, the below routine does not append it and instead
       // returns a Vertex2DSimple with an index of -1
@@ -95,6 +95,8 @@ class ViewController: UIViewController, DelaunayTriangulationMetalViewDelegate {
     } // end of if triangleRef.index0
     
   } // end of func triangulateLogic()
+  
+  // MARK: - Delegate methods
   
   func fpsUpdate(fps: Int, triangleCount: Int) {
     let description = "fps: \(Int(fps)), triangles: \(triangleCount))"

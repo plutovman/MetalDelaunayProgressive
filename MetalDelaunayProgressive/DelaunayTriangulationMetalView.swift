@@ -71,7 +71,7 @@ class DelaunayTriangulationMetalView: MTKView {
     if frameCounter == 100
     {
       let frametime = (CFAbsoluteTimeGetCurrent() - frameStartTime) / 100
-      MetalViewDelegate?.fpsUpdate(fps: Int(1 / frametime), triangleCount: triangleCount) // let the delegate know of the frame update
+      MetalViewDelegate?.fpsUpdate(fps: Int(1 / frametime), triangleCount: delaunayTriangleArrayRef.count) // let the delegate know of the frame update
       print ("...frametime: \((Int(1/frametime)))")
       frameStartTime = CFAbsoluteTimeGetCurrent() // reset start time
       frameCounter = 0 // reset counter
@@ -304,27 +304,20 @@ class DelaunayTriangulationMetalView: MTKView {
   
   func delaunaySubTriangulatePoint(vertex: Vertex2DSimple, triangleReference: TriangleRef) {
     
-    var subPointCloud2DMetal = [Vertex2DSimple]() // define and initialize a local point cloud
     // extract vertices from triangleRef
     let v0 = pointCloud2DMetal[triangleReference.index0]
     let v1 = pointCloud2DMetal[triangleReference.index1]
     let v2 = pointCloud2DMetal[triangleReference.index2]
-    //let p3 = Vertex2DSimple(x: CGFloat(point.x), y: CGFloat(point.y), index: 3)
-    
-    // append new vertices to subPointCloud2DMetal
-    subPointCloud2DMetal.append(v0)
-    subPointCloud2DMetal.append(v1)
-    subPointCloud2DMetal.append(v2)
-    subPointCloud2DMetal.append(vertex)
-    
-    // before performing a local triangulation, we want to remove the passed triangleReference triangle from
-    // delaunayTriangleArrayRef, as it will be replaced by the subtriangles generated in the next step
-    if let index = delaunayTriangleArrayRef.index(of: triangleReference) {
-      delaunayTriangleArrayRef.remove(at: index)
-    }
+    let subPointCloud2DMetal = [v0,v1,v2,vertex]
 
     // triangulate points in subPointCloud2DMetal
     let subTriangleArrayRef = Delaunay().triangulate(vertices: subPointCloud2DMetal)
+    
+    // before appending the new triangles to delaunayTriangleArrayRef,  we want to remove the passed triangleReference triangle from it
+    // as this containing triangle will be replaced by the subtriangles generated in the next step
+    if let index = delaunayTriangleArrayRef.index(of: triangleReference) {
+      delaunayTriangleArrayRef.remove(at: index)
+    }
     
     // add triangleRef's to master delaunayTriangleArrayRef
     for triangleRef in subTriangleArrayRef {
@@ -332,11 +325,11 @@ class DelaunayTriangulationMetalView: MTKView {
     } // end of for
     
     // rebuild color mesh
-    delaunayBuildColoredMesh()
+    //delaunayBuildColoredMesh()
     
   } // end of func delaunaySubTriangulatePoint()
   
-  
+  /*
   func delaunayBuildColoredMeshOld (vertexCloud2D: [Vertex2DSimple] ) {
     //delaunayTriangleMeshOrderedVertices = [] // empty out ordered 3D array
     //let delaunayTriangleReferences = Delaunay().triangulate(pointCloud2DMetal)
@@ -349,17 +342,17 @@ class DelaunayTriangulationMetalView: MTKView {
       delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index2])
     } // end of for
   } // end of func delaunayBuildColoredMesh ()
+  */
   
   func delaunayBuildColoredMesh () {
-    //delaunayTriangleMeshOrderedVertices = [] // empty out ordered 3D array
-    //let delaunayTriangleReferences = Delaunay().triangulate(pointCloud2DMetal)
-    //delaunayTriangleArrayRef = Delaunay().triangulate(vertices: vertexCloud2D)
     print ("...about to draw \(delaunayTriangleArrayRef.count) triangles")
     //triangleCount = delaunayTriangleArrayRef.count
     for triangleRef in delaunayTriangleArrayRef {
-      delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index0])
-      delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index1])
-      delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index2])
+      delaunayTriangleMeshOrderedVertices.append(contentsOf: [
+        pointCloud3DMetal[triangleRef.index0],
+        pointCloud3DMetal[triangleRef.index1],
+        pointCloud3DMetal[triangleRef.index2]
+        ])
     } // end of for
   } // end of func delaunayBuildColoredMesh ()
   
