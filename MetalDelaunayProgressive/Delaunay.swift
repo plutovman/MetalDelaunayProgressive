@@ -14,7 +14,7 @@ open class Delaunay {
   public init() { }
   
   /* Generates a supertraingle containing all other triangles */
-  fileprivate func supertriangle(_ vertices: [Vertex2DSimple]) -> [Vertex2DSimple] {
+  fileprivate func supertriangle(vertices: [Vertex2DSimple]) -> [Vertex2DSimple] {
     var xmin = CGFloat(Int32.max)
     var ymin = CGFloat(Int32.max)
     var xmax = -CGFloat(Int32.max)
@@ -41,7 +41,7 @@ open class Delaunay {
   }
   
   /* Calculate a circumcircle for a set of 3 vertices */
-  fileprivate func circumcircle(_ i: Vertex2DSimple, j: Vertex2DSimple, k: Vertex2DSimple) -> Circumcircle {
+  fileprivate func circumcircle(i: Vertex2DSimple, j: Vertex2DSimple, k: Vertex2DSimple) -> Circumcircle {
     let x1 = i.x
     let y1 = i.y
     let x2 = j.x
@@ -91,7 +91,7 @@ open class Delaunay {
     return Circumcircle(vertex1: i, vertex2: j, vertex3: k, x: xc, y: yc, rsqr: rsqr)
   }
   
-  fileprivate func dedup(_ edges: [Vertex2DSimple]) -> [Vertex2DSimple] {
+  fileprivate func dedup(edges: [Vertex2DSimple]) -> [Vertex2DSimple] {
     
     var e = edges
     var a: Vertex2DSimple?, b: Vertex2DSimple?, m: Vertex2DSimple?, n: Vertex2DSimple?
@@ -121,7 +121,10 @@ open class Delaunay {
     return e
   }
   
-  open func triangulateOld(_ vertices: [Vertex2DSimple]) -> [Triangle2D] {
+  open func triangulateOld(vertices: [Vertex2DSimple]) -> [Triangle2D] {
+    // this is the original routine that returns an array of triangle2d.
+    // for a smaller footprint we want to return an array of triangleRef's
+    
     
     var _vertices = vertices.removeDuplicates()
     
@@ -141,12 +144,12 @@ open class Delaunay {
     /* Next, find the vertices of the supertriangle (which contains all other
      * triangles) */
     
-    _vertices += supertriangle(_vertices)
+    _vertices += supertriangle(vertices: _vertices)
     
     /* Initialize the open list (containing the supertriangle and nothing
      * else) and the closed list (which is empty since we havn't processed
      * any triangles yet). */
-    open.append(circumcircle(_vertices[n], j: _vertices[n + 1], k: _vertices[n + 2]))
+    open.append(circumcircle(i: _vertices[n], j: _vertices[n + 1], k: _vertices[n + 2]))
     
     /* Incrementally add each vertex to the mesh. */
     for i in 0..<n {
@@ -193,7 +196,7 @@ open class Delaunay {
       }
       
       /* Remove any doubled edges. */
-      edges = dedup(edges)
+      edges = dedup(edges: edges)
       
       /* Add a new triangle for each edge. */
       var j = edges.count
@@ -203,7 +206,7 @@ open class Delaunay {
         let b = edges[j]
         j -= 1
         let a = edges[j]
-        open.append(circumcircle(a, j: b, k: _vertices[c]))
+        open.append(circumcircle(i: a, j: b, k: _vertices[c]))
       }
     }
     
@@ -230,9 +233,13 @@ open class Delaunay {
   }
   
   
-  open func triangulate(_ vertices: [Vertex2DSimple]) -> [TriangleRef] {
-    
-    var _vertices = vertices.removeDuplicates()
+  open func triangulate(vertices: [Vertex2DSimple]) -> [TriangleRef] {
+    //
+    // we assume in this routine that we have a [vertices] array that has no duplicates
+    // removing duplicate vertices is mildly expensive at this stage.
+    //
+    //var _vertices = vertices.removeDuplicates()
+    var _vertices = vertices
     
     guard _vertices.count >= 3 else {
       return [TriangleRef]()
@@ -250,12 +257,12 @@ open class Delaunay {
     /* Next, find the vertices of the supertriangle (which contains all other
      * triangles) */
     
-    _vertices += supertriangle(_vertices)
+    _vertices += supertriangle(vertices: _vertices)
     
     /* Initialize the open list (containing the supertriangle and nothing
      * else) and the closed list (which is empty since we havn't processed
      * any triangles yet). */
-    open.append(circumcircle(_vertices[n], j: _vertices[n + 1], k: _vertices[n + 2]))
+    open.append(circumcircle(i: _vertices[n], j: _vertices[n + 1], k: _vertices[n + 2]))
     
     /* Incrementally add each vertex to the mesh. */
     for i in 0..<n {
@@ -302,7 +309,7 @@ open class Delaunay {
       }
       
       /* Remove any doubled edges. */
-      edges = dedup(edges)
+      edges = dedup(edges: edges)
       
       /* Add a new triangle for each edge. */
       var j = edges.count
@@ -312,7 +319,7 @@ open class Delaunay {
         let b = edges[j]
         j -= 1
         let a = edges[j]
-        open.append(circumcircle(a, j: b, k: _vertices[c]))
+        open.append(circumcircle(i: a, j: b, k: _vertices[c]))
       }
     }
     
@@ -332,7 +339,7 @@ open class Delaunay {
       }
       
       //return Triangle2D(vertex1: circumCircle.vertex1, vertex2: circumCircle.vertex2, vertex3: circumCircle.vertex3)
-      return TriangleRef(index1: circumCircle.vertex1.index, index2: circumCircle.vertex2.index, index3: circumCircle.vertex3.index)
+      return TriangleRef(index0: circumCircle.vertex1.index, index1: circumCircle.vertex2.index, index2: circumCircle.vertex3.index)
     }
     
     /* Yay, we're done! */

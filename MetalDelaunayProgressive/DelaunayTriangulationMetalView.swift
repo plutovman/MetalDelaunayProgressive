@@ -55,10 +55,7 @@ class DelaunayTriangulationMetalView: MTKView {
       // if we want to generate triangles via the view's internal timer, we want to
       // call a generation routine (such as metalInitializeDrawingCanvas() AND, we must take care
       // to set the view's .enableSetNeedsDisplay = true  and .isPaused = true
-      //setupTrianglesRandom(numTriangles: 10000)
-      //setupTrianglesDelaunay(vertexCount: 1000)
- 
-      metalInitializeDrawingCanvas () // set up some basic drawing vertices
+      //metalInitializeDrawingCanvas () // set up some basic drawing vertices
       
       // regardless of whether we are updating manually via user event (such as touchesBegan)
       // or we use the view's internal timer, we must always update state via metalRenderColoredMesh()
@@ -85,10 +82,10 @@ class DelaunayTriangulationMetalView: MTKView {
     initializeMetalArrays() // zero out geometry arrays
     
     setupVerticesViewBBox() // set up perimeter vertices
-    setupVerticesRandom(numVertices: 1000) // add a few vertices throughout
-    
-    delaunayComputeColoredMesh(vertexCloud2D: pointCloud2DMetal) // compute resulting triangles
-    
+    setupVerticesRandom(numVertices: 100) // add a few vertices throughout
+    delaunayTriangleArrayRef = Delaunay().triangulate(vertices: pointCloud2DMetal) //  perform delaunay triangulation
+    //delaunayBuildColoredMesh(vertexCloud2D: pointCloud2DMetal) // compute resulting triangles (updates delaunayTriangleArrayRef with vertex indices)
+    delaunayBuildColoredMesh() // populate delaunayTriangleMeshOrderedVertices array that will eventually get rendered
   } // end of func initializeDrawingCanvas ()
   
   func metalSetupRenderPipeline(){
@@ -186,6 +183,36 @@ class DelaunayTriangulationMetalView: MTKView {
 
   } // end of func initializeMetalArrays()
   
+  func vertexAppendToPointCloudArrays (point: CGPoint, color: UIColor) -> Vertex2DSimple {
+
+    let rgba = color.getRGBAComponents()!
+    let x0 = Float(point.x)
+    let y0 = Float(point.y)
+    let r0 = Float(rgba.red)
+    let g0 = Float(rgba.green)
+    let b0 = Float(rgba.blue)
+    let a0 = Float(1.0)
+    var returnedVertex2D: Vertex2DSimple
+    
+    let vertex2D = Vertex2DSimple(x: CGFloat(x0), y: CGFloat(y0), index: pointCloud2DMetal.count)
+    let vertex3D = Vertex3DColor(x: x0, y: y0, z: 0.0, r: r0, g: g0, b: b0, a: a0)
+    
+    // append vertex to master 3D and 2D arrays ONLY if it's a new vertex
+    if pointCloud2DMetal.contains(vertex2D) {
+      print ("...[vertexAppendToPointCloudArrays]: skipping already existing vertex")
+      returnedVertex2D = Vertex2DSimple(x: CGFloat(x0), y: CGFloat(y0), index: -1) // if the pointCloud already has this vertex, we return a dummy one to throw away
+    } else {
+      pointCloud3DMetal.append(vertex3D)
+      pointCloud2DMetal.append(vertex2D)
+      returnedVertex2D = vertex2D
+    }
+    //print ("...returned vertex2D: \(returnedVertex2D)")
+    
+    return returnedVertex2D
+  } // end of func vertexAppend
+  
+  
+  
   
   // overall note about vertices.  we WANT to work with Vertex3DColor from the get go.
   // ho
@@ -202,30 +229,38 @@ class DelaunayTriangulationMetalView: MTKView {
   // 3. find out the triangle that contains the new point
   // 4. delete triangle ref from [TriangleRef]
   // 5. create a new [Vertex2DSimple] array containing index references to the new point coord, plus refs to the coordinates of the triangle just deleted
-  // 6. run delaunayComputeColoredMesh() on that array which will return an updated [TriangleRef]
+  // 6. run delaunayBuildColoredMesh() on that array which will return an updated [TriangleRef]
   
   func setupVerticesViewBBox() {
+    
     // note on the use of arrays:
     // pointCloud3DMetal is the master 3d array that we use to store vertex data
     // pointCloud2DMetal is the condensed and indexed array we use to do delaunay triangulation computations
     // delaunayTriangleMeshOrderedVertices is the 3d array that stored ordered coordinates that define delaunay triangles
     
-    let v0 = Vertex3DColor(x: -1.0, y: 1.0, z: 0.0, r: 1.0, g: 0.0, b: 0.0, a: 1.0) // ul
-    let v1 = Vertex3DColor(x: 1.0, y: 1.0, z: 0.0, r: 0.0, g: 1.0, b: 0.0, a: 1.0) // ur
-    let v2 = Vertex3DColor(x: -1.0, y: -1.0, z: 0.0, r: 0.0, g: 0.0, b: 1.0, a: 1.0) // ll
-    let v3 = Vertex3DColor(x: 1.0, y: -1.0, z: 0.0, r: 1.0, g: 1.0, b: 0.0, a: 1.0) // lr
+    // define bbox vertices
+    let ul = CGPoint(x: -1.0, y:  1.0)
+    let um = CGPoint(x:  0.0, y:  1.0)
+    let ur = CGPoint(x:  1.0, y:  1.0)
     
-    // append vertices to master 3D array
-    pointCloud3DMetal.append(v0)
-    pointCloud3DMetal.append(v1)
-    pointCloud3DMetal.append(v2)
-    pointCloud3DMetal.append(v3)
-     
-    // append vertices to master 2D array
-    pointCloud2DMetal.append(Vertex2DSimple(x: CGFloat(v0.x), y: CGFloat(v0.y), index: pointCloud2DMetal.count))
-    pointCloud2DMetal.append(Vertex2DSimple(x: CGFloat(v1.x), y: CGFloat(v1.y), index: pointCloud2DMetal.count))
-    pointCloud2DMetal.append(Vertex2DSimple(x: CGFloat(v2.x), y: CGFloat(v2.y), index: pointCloud2DMetal.count))
-    pointCloud2DMetal.append(Vertex2DSimple(x: CGFloat(v3.x), y: CGFloat(v3.y), index: pointCloud2DMetal.count))
+    let ml = CGPoint(x: -1.0, y:  0.0)
+    let mr = CGPoint(x:  1.0, y:  0.0)
+    
+    let ll = CGPoint(x: -1.0, y: -1.0)
+    let lm = CGPoint(x:  0.0, y: -1.0)
+    let lr = CGPoint(x:  1.0, y: -1.0)
+    
+    // append vertices to point cloud arrays
+    let _ = vertexAppendToPointCloudArrays(point: ul, color: UIColor.red)
+    let _ = vertexAppendToPointCloudArrays(point: um, color: UIColor.blue)
+    let _ = vertexAppendToPointCloudArrays(point: ur, color: UIColor.green)
+    
+    let _ = vertexAppendToPointCloudArrays(point: ml, color: UIColor.green)
+    let _ = vertexAppendToPointCloudArrays(point: mr, color: UIColor.yellow)
+    
+    let _ = vertexAppendToPointCloudArrays(point: ll, color: UIColor.blue)
+    let _ = vertexAppendToPointCloudArrays(point: lm, color: UIColor.green)
+    let _ = vertexAppendToPointCloudArrays(point: lr, color: UIColor.magenta)
  
     
   } // end of func setupVerticesViewBBox()
@@ -233,36 +268,102 @@ class DelaunayTriangulationMetalView: MTKView {
   func setupVerticesRandom(numVertices: Int) {
     
     for _ in 0 ... numVertices {
-      let x0 = Float.random(-1.0, 1.0)
-      let y0 = Float.random(-1.0, 1.0)
-      let r0 = Float.random(0,1)
-      let g0 = Float.random(0,1)
-      let b0 = Float.random(0,1)
-      let vertex3D = Vertex3DColor(x: x0, y: y0, z: 0.0, r: r0, g: g0, b: b0, a: 1.0)
-      let vertex2D = Vertex2DSimple(x: CGFloat(x0), y: CGFloat(y0), index: pointCloud2DMetal.count)
-      
-      // append vertex to master 3D and 2D arrays
-      pointCloud3DMetal.append(vertex3D)
-      pointCloud2DMetal.append(vertex2D)
-      
+      let x0 = CGFloat.random(-1.0, 1.0)
+      let y0 = CGFloat.random(-1.0, 1.0)
+      let pt2DMetal = CGPoint(x: x0, y: y0)
+      let colorRandom = UIColor.clear.randomColor()
+      let _ = vertexAppendToPointCloudArrays(point: pt2DMetal, color: colorRandom)
+ 
     } // end of for
     //print ("...[DelaunayTriangulationMetalView] 2D size: \(pointCloud2DMetal.count) 3D size: \(pointCloud3DMetal.count)")
     
   } // end of func setupVerticesRandom()
   
+  func delaunayFindTriangleForPoint(p: CGPoint) -> TriangleRef {
+    var cnt = 0
+    var searchActive = true
+    //print ("...about to search through \(delaunayTriangleArrayRef.count) triangles")
+    
+    while searchActive && cnt < delaunayTriangleArrayRef.count {
+      let triangleRef = delaunayTriangleArrayRef[cnt]
+      let v1 = pointCloud2DMetal[triangleRef.index0]
+      let v2 = pointCloud2DMetal[triangleRef.index1]
+      let v3 = pointCloud2DMetal[triangleRef.index2]
+      let triangle = Triangle2D(vertex1: v1, vertex2: v2, vertex3: v3)
+      if triangle.containsPoint(point: p) {
+        searchActive = false // stop search.  we've found our guy
+        //print ("......\(cnt) :: \(p) : \(triangle.vertex1) \(triangle.vertex2) \(triangle.vertex3)")
+        return triangleRef
+      } // end of if
+      cnt += 1
+    } // end of while
+    return TriangleRef(index0: 0, index1: 0, index2: 0) // it feels like bad design to return a TriangleRef with dummy indices...)
+  
+    
+  } // end of func delaunayFindTriangle()
+  
+  func delaunaySubTriangulatePoint(vertex: Vertex2DSimple, triangleReference: TriangleRef) {
+    
+    var subPointCloud2DMetal = [Vertex2DSimple]() // define and initialize a local point cloud
+    // extract vertices from triangleRef
+    let v0 = pointCloud2DMetal[triangleReference.index0]
+    let v1 = pointCloud2DMetal[triangleReference.index1]
+    let v2 = pointCloud2DMetal[triangleReference.index2]
+    //let p3 = Vertex2DSimple(x: CGFloat(point.x), y: CGFloat(point.y), index: 3)
+    
+    // append new vertices to subPointCloud2DMetal
+    subPointCloud2DMetal.append(v0)
+    subPointCloud2DMetal.append(v1)
+    subPointCloud2DMetal.append(v2)
+    subPointCloud2DMetal.append(vertex)
+    
+    // before performing a local triangulation, we want to remove the passed triangleReference triangle from
+    // delaunayTriangleArrayRef, as it will be replaced by the subtriangles generated in the next step
+    if let index = delaunayTriangleArrayRef.index(of: triangleReference) {
+      delaunayTriangleArrayRef.remove(at: index)
+    }
+
+    // triangulate points in subPointCloud2DMetal
+    let subTriangleArrayRef = Delaunay().triangulate(vertices: subPointCloud2DMetal)
+    
+    // add triangleRef's to master delaunayTriangleArrayRef
+    for triangleRef in subTriangleArrayRef {
+      delaunayTriangleArrayRef.append(triangleRef)
+    } // end of for
+    
+    // rebuild color mesh
+    delaunayBuildColoredMesh()
+    
+  } // end of func delaunaySubTriangulatePoint()
   
   
-  func delaunayComputeColoredMesh (vertexCloud2D: [Vertex2DSimple] ) {
-    delaunayTriangleMeshOrderedVertices = [] // empty out ordered 3D array
+  func delaunayBuildColoredMeshOld (vertexCloud2D: [Vertex2DSimple] ) {
+    //delaunayTriangleMeshOrderedVertices = [] // empty out ordered 3D array
     //let delaunayTriangleReferences = Delaunay().triangulate(pointCloud2DMetal)
-    let delaunayTriangleReferences = Delaunay().triangulate(vertexCloud2D)
-    triangleCount = delaunayTriangleReferences.count
-    for triangleRef in delaunayTriangleReferences {
+    //delaunayTriangleArrayRef = Delaunay().triangulate(vertices: vertexCloud2D)
+    print ("...about to draw \(delaunayTriangleArrayRef.count) triangles")
+    //triangleCount = delaunayTriangleArrayRef.count
+    for triangleRef in delaunayTriangleArrayRef {
+      delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index0])
       delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index1])
       delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index2])
-      delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index3])
     } // end of for
-  } // end of func delaunayComputeColoredMesh ()
+  } // end of func delaunayBuildColoredMesh ()
+  
+  func delaunayBuildColoredMesh () {
+    //delaunayTriangleMeshOrderedVertices = [] // empty out ordered 3D array
+    //let delaunayTriangleReferences = Delaunay().triangulate(pointCloud2DMetal)
+    //delaunayTriangleArrayRef = Delaunay().triangulate(vertices: vertexCloud2D)
+    print ("...about to draw \(delaunayTriangleArrayRef.count) triangles")
+    //triangleCount = delaunayTriangleArrayRef.count
+    for triangleRef in delaunayTriangleArrayRef {
+      delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index0])
+      delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index1])
+      delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index2])
+    } // end of for
+  } // end of func delaunayBuildColoredMesh ()
+  
+  
   
   
 

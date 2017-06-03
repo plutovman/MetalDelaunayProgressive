@@ -19,6 +19,7 @@ public struct Vertex2DSimple {
   public let y: CGFloat
   public let index: Int
   
+  /*
   func convertSpaceMetalToDevice () -> CGPoint {
     let xdevice = ( x + 1.0 )  / 2.0 * UIScreen.main.bounds.size.width
     let ydevice = ( y + 1.0 )  / 2.0 * UIScreen.main.bounds.size.height
@@ -30,6 +31,7 @@ public struct Vertex2DSimple {
     let ymetal = (y / UIScreen.main.bounds.size.height ) * 2.0 - 1.0
     return CGPoint(x: xmetal, y: ymetal)
   }
+  */
   
   
 } // end of public struct Vertex2DSimple

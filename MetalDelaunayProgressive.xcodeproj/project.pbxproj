@@ -20,7 +20,7 @@
 		E7CA93D61EDFD14600C8C175 /* Triangle2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93D11EDFD14600C8C175 /* Triangle2D.swift */; };
 		E7CA93D71EDFD14600C8C175 /* Vertex2DSimple.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93D21EDFD14600C8C175 /* Vertex2DSimple.swift */; };
 		E7CA93DA1EDFD2F700C8C175 /* TriangleRef.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93D91EDFD2F700C8C175 /* TriangleRef.swift */; };
-		E7CA93DC1EDFD3EC00C8C175 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93DB1EDFD3EC00C8C175 /* Utilities.swift */; };
+		E7CA93DC1EDFD3EC00C8C175 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93DB1EDFD3EC00C8C175 /* Extensions.swift */; };
 		E7CA93DE1EDFD59000C8C175 /* Vertex3DColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93DD1EDFD59000C8C175 /* Vertex3DColor.swift */; };
 		E7CA93E01EDFDB5000C8C175 /* DelaunayTriangulationMetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93DF1EDFDB5000C8C175 /* DelaunayTriangulationMetalView.swift */; };
 		E7CA93E21EDFF28300C8C175 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = E7CA93E11EDFF28300C8C175 /* Shaders.metal */; };
@@ -63,7 +63,7 @@
 		E7CA93D11EDFD14600C8C175 /* Triangle2D.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Triangle2D.swift; sourceTree = "<group>"; };
 		E7CA93D21EDFD14600C8C175 /* Vertex2DSimple.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex2DSimple.swift; sourceTree = "<group>"; };
 		E7CA93D91EDFD2F700C8C175 /* TriangleRef.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TriangleRef.swift; sourceTree = "<group>"; };
-		E7CA93DB1EDFD3EC00C8C175 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		E7CA93DB1EDFD3EC00C8C175 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		E7CA93DD1EDFD59000C8C175 /* Vertex3DColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex3DColor.swift; sourceTree = "<group>"; };
 		E7CA93DF1EDFDB5000C8C175 /* DelaunayTriangulationMetalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DelaunayTriangulationMetalView.swift; sourceTree = "<group>"; };
 		E7CA93E11EDFF28300C8C175 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
@@ -158,7 +158,7 @@
 				E7CA93D11EDFD14600C8C175 /* Triangle2D.swift */,
 				E7CA93D21EDFD14600C8C175 /* Vertex2DSimple.swift */,
 				E7CA93DD1EDFD59000C8C175 /* Vertex3DColor.swift */,
-				E7CA93DB1EDFD3EC00C8C175 /* Utilities.swift */,
+				E7CA93DB1EDFD3EC00C8C175 /* Extensions.swift */,
 			);
 			name = Delaunay;
 			sourceTree = "<group>";
@@ -309,7 +309,7 @@
 				E7CA93D71EDFD14600C8C175 /* Vertex2DSimple.swift in Sources */,
 				E7CA93D61EDFD14600C8C175 /* Triangle2D.swift in Sources */,
 				E7CA93D51EDFD14600C8C175 /* Edge.swift in Sources */,
-				E7CA93DC1EDFD3EC00C8C175 /* Utilities.swift in Sources */,
+				E7CA93DC1EDFD3EC00C8C175 /* Extensions.swift in Sources */,
 				E7CA93A11EDFCEF000C8C175 /* AppDelegate.swift in Sources */,
 				E7CA93DA1EDFD2F700C8C175 /* TriangleRef.swift in Sources */,
 			);
@@ -564,6 +564,7 @@
 				E7CA93C71EDFCEF000C8C175 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E7CA93C81EDFCEF000C8C175 /* Build configuration list for PBXNativeTarget "MetalDelaunayProgressiveTests" */ = {
 			isa = XCConfigurationList;
@@ -572,6 +573,7 @@
 				E7CA93CA1EDFCEF000C8C175 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E7CA93CB1EDFCEF000C8C175 /* Build configuration list for PBXNativeTarget "MetalDelaunayProgressiveUITests" */ = {
 			isa = XCConfigurationList;
@@ -580,6 +582,7 @@
 				E7CA93CD1EDFCEF000C8C175 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
