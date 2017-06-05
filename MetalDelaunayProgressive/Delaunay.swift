@@ -225,7 +225,7 @@ open class Delaunay {
         return nil
       }
       
-      return Triangle2D(vertex1: circumCircle.vertex1, vertex2: circumCircle.vertex2, vertex3: circumCircle.vertex3)
+      return Triangle2D(vertex0: circumCircle.vertex1, vertex1: circumCircle.vertex2, vertex2: circumCircle.vertex3)
     }
     
     /* Yay, we're done! */

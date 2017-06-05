@@ -53,7 +53,8 @@ class ViewController: UIViewController, DelaunayTriangulationMetalViewDelegate {
     
     if let touch = touches.first  {
       let touchPoint = touch.location(in: view)
-      triangulateLogic(touchPoint: touchPoint)
+      //triangulateLogic(touchPoint: touchPoint)
+      triangulatePoints(pointCloud: [touchPoint])
     } // end of if let touch
   } // end of func touchesBegan()
   
@@ -61,13 +62,46 @@ class ViewController: UIViewController, DelaunayTriangulationMetalViewDelegate {
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
     if let touch = touches.first  {
       let touchPoint = touch.location(in: view)
-      triangulateLogic(touchPoint: touchPoint)
+      //triangulateLogic(touchPoint: touchPoint)
+      triangulatePoints(pointCloud: [touchPoint])
     } // end if if let touch
   } // end of func touchesMoved()
  
   
   // MARK: - Misc methods
   
+  func triangulatePoints(pointCloud: [CGPoint]){
+    
+    for pt2DDevice in pointCloud {
+      let pt2DMetal = pt2DDevice.convertSpaceDeviceToMetal() // convert to metal units
+      let ptColor = UIColor.clear.randomColor()
+      
+      let triangleRefs: [TriangleRef] = delaunayView.delaunayContainingTrianglesForPoint(p: pt2DMetal)
+      print ("[triangulatePoints]: for \(pt2DDevice) found \(triangleRefs.count) triangles ")
+      
+      if triangleRefs.count > 0 {
+        // note that if the vertex already exists in delaunayView's point cloud, the below routine does not append it and instead returns a Vertex2DSimple with an index of -1
+        let vertex2D = delaunayView.vertexAppendToPointCloudArrays(point: pt2DMetal, color: ptColor)
+        // only triangulate new vertices
+        
+        if vertex2D.index > 0 {
+          /*
+          for triangleRef in triangleRefs {
+            delaunayView.delaunaySubTriangulatePointOld(vertex: vertex2D, triangleReference: triangleRef)
+          } // end of for triangleRef
+          */
+          delaunayView.delaunaySubTriangulatePoint(vertex: vertex2D, triangleRefArray: triangleRefs)
+          
+          delaunayView.setNeedsDisplay() // redraw
+        } // end of if vertex2D.index > 0
+        
+      } // end of if triangleRefs.count > 0
+      
+    } // end of for pt2DDevice in pointCloud
+    
+  } // end of func triangulatePoints()
+
+  /*
   func triangulateLogic(touchPoint: CGPoint){
     let pt2DDevice = touchPoint // convert touch to Vertex2DSimple
     let pt2DMetal = pt2DDevice.convertSpaceDeviceToMetal() // convert to metal units
@@ -95,6 +129,7 @@ class ViewController: UIViewController, DelaunayTriangulationMetalViewDelegate {
     } // end of if triangleRef.index0
     
   } // end of func triangulateLogic()
+  */
   
   // MARK: - Delegate methods
   
