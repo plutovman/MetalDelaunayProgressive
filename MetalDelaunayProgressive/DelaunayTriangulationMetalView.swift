@@ -155,7 +155,7 @@ class DelaunayTriangulationMetalView: MTKView {
       // 7a. Create a renderCommandEncoder four our renderPipeline
       let renderCommandEncoder: MTLRenderCommandEncoder? = commandBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
       renderCommandEncoder?.label = "Render Command Encoder"
-      //renderCommandEncoder?.setTriangleFillMode(.lines)
+      renderCommandEncoder?.setTriangleFillMode(.lines)
       //////////renderCommandEncoder?.pushDebugGroup("Tessellate and Render")
       renderCommandEncoder?.setRenderPipelineState(renderPipeline!)
       renderCommandEncoder?.setVertexBuffer(vertexBuffer, offset: 0, at: 0)
@@ -324,8 +324,42 @@ class DelaunayTriangulationMetalView: MTKView {
     } // end of for triangleRef
     return triangleRefs
   } // end of func delaunayContainingTrianglesForPoints()
-  
   func delaunaySubTriangulatePoint(vertex: Vertex2DSimple, triangleRefArray: [TriangleRef]) {
+    
+    for triangleReference in triangleRefArray {
+      let v0 = pointCloud2DMetal[triangleReference.index0]
+      let v1 = pointCloud2DMetal[triangleReference.index1]
+      let v2 = pointCloud2DMetal[triangleReference.index2]
+      let vertexArray = [v0,v1,v2]
+      
+      let subTriangleArrayRef = Delaunay().triangulateSimple(vertices: vertexArray, point: vertex)
+      
+      if let index = delaunayTriangleRefArray.index(of: triangleReference) {
+        // before appending the new triangles to delaunayTriangleRefArray,  we want to remove the passed triangleReference triangle from it
+        // as this containing triangle will be replaced by the subtriangles generated in the next step
+        delaunayTriangleRefArray.remove(at: index)
+        
+        // remove corresponding vertices from delaunayTriangleMeshOrderedVertices render array
+        // note that we remove in 'last in, first out' fashion
+        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 2))
+        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 1))
+        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 0))
+        
+      } // end of if let index
+      
+      // add triangleRef's to master delaunayTriangleRefArray
+      for subTriangleReference in subTriangleArrayRef {
+        delaunayTriangleRefArray.append(subTriangleReference)
+      } // end of for
+      
+      // update delaunayTriangleMeshOrderedVertices with subTriangleArrayRef vertices
+      delaunayPopulateRenderArray(triangleRefArray: subTriangleArrayRef)
+      
+    } // end of for triangleReference in triangleRefArray
+    
+  } // end of func delaunaySubTriangulatePoint
+  
+  func delaunaySubTriangulatePointOld2(vertex: Vertex2DSimple, triangleRefArray: [TriangleRef]) {
 
     var subPointCloud2DMetal: [Vertex2DSimple] = [vertex] // initialize array with passed vertex
     for triangleReference in triangleRefArray {
@@ -339,6 +373,7 @@ class DelaunayTriangulationMetalView: MTKView {
     
     // triangulate points in subPointCloud2DMetal
     let subTriangleArrayRef = Delaunay().triangulate(vertices: subPointCloud2DMetal)
+    
     print ("...[delaunaySubTriangulatePoint]: computed \(subTriangleArrayRef.count) triangles")
     
     for triangleReference in triangleRefArray {

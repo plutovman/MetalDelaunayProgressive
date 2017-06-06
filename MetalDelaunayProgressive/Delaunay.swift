@@ -20,6 +20,8 @@ open class Delaunay {
     var xmax = -CGFloat(Int32.max)
     var ymax = -CGFloat(Int32.max)
     
+    
+    
     for i in 0..<vertices.count {
       if vertices[i].x < xmin { xmin = vertices[i].x }
       if vertices[i].x > xmax { xmax = vertices[i].x }
@@ -344,5 +346,36 @@ open class Delaunay {
     
     /* Yay, we're done! */
     return results
-  }
-}
+  } // end of triangulate
+  
+  open func triangulateSimple(vertices: [Vertex2DSimple], point: Vertex2DSimple) -> [TriangleRef] {
+    
+    /* Make an array of indices into the vertex array, sorted by the
+     * vertices' x-position. */
+    let n = vertices.count
+    var indices = [Int](0..<n).sorted {  vertices[$0].x < vertices[$1].x }
+    
+    // presumably 
+    // indices[0] is left-most
+    // indices[1] is middle
+    // indices[2] is right-most
+    let vertex_left = vertices[indices[0]]
+    let vertex_mid = vertices[indices[1]]
+    let vertex_right = vertices[indices[2]]
+    
+    if point.x >= vertex_mid.x {
+      let t1 = TriangleRef(index0: vertex_left.index, index1: vertex_right.index, index2: point.index)
+      let t2 = TriangleRef(index0: vertex_right.index, index1: vertex_mid.index, index2: point.index)
+      let t3 = TriangleRef(index0: vertex_mid.index, index1: vertex_left.index, index2: point.index)
+      return [t1,t2,t3]
+    } else {
+      let t1 = TriangleRef(index0: vertex_left.index, index1: vertex_mid.index, index2: point.index)
+      let t2 = TriangleRef(index0: vertex_mid.index, index1: vertex_right.index, index2: point.index)
+      let t3 = TriangleRef(index0: vertex_right.index, index1: vertex_left.index, index2: point.index)
+      return [t1,t2,t3] 
+    }
+    
+    
+  } // end of open func triangulateSimple()
+  
+} // end of class Delaunay
