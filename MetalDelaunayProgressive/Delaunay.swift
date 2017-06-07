@@ -349,7 +349,11 @@ open class Delaunay {
   } // end of triangulate
   
   open func triangulateSimple(vertices: [Vertex2DSimple], point: Vertex2DSimple) -> [TriangleRef] {
-    
+    // this is a cludgy routine that takes a triangle and a point (presumably) inside the triangle
+    // and creates 3 smaller triangles that all share that single vertex
+    // keeping around just for historical purpose, but not likely to be used in the future
+    // the resulting triangles are each put together in counter-clockwise fashion.  
+    //
     /* Make an array of indices into the vertex array, sorted by the
      * vertices' x-position. */
     let n = vertices.count

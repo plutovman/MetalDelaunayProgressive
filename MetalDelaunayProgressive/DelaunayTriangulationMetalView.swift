@@ -82,13 +82,8 @@ class DelaunayTriangulationMetalView: MTKView {
     initializeMetalArrays() // zero out geometry arrays
     
     setupVerticesViewBBox() // set up perimeter vertices
-    
     //setupVerticesRandom(numVertices: 100) // add a few vertices throughout
-    
-    //delaunayTriangleRefArray = Delaunay().triangulate(vertices: pointCloud2DMetal) //  perform delaunay triangulation
-    delaunayTriangulate()
-    
-    //delaunayPopulateRenderArray(triangleRefArray: delaunayTriangleRefArray) // populate delaunayTriangleMeshOrderedVertices array that will eventually get rendered
+    delaunayTriangulateAndPopulateRenderArray()
   } // end of func initializeDrawingCanvas ()
   
   func metalSetupRenderPipeline(){
@@ -357,199 +352,14 @@ class DelaunayTriangulationMetalView: MTKView {
     return triangleRefs
   } // end of func delaunayContainingTrianglesForPoints()
   
-  func delaunayTriangulate() {
+  func delaunayTriangulateAndPopulateRenderArray() {
     delaunayTriangleRefArray = Delaunay().triangulate(vertices: pointCloud2DMetal) // retriangulate using updated pointcloud
     delaunayTriangleMeshOrderedVertices = [] // empty out render array
     delaunayPopulateRenderArray(triangleRefArray: delaunayTriangleRefArray) // repopulate render array
-    
     MetalViewDelegate?.fpsUpdate(fps: 0, triangleCount: delaunayTriangleRefArray.count) // let the delegate know of the frame update
-    
-    
-    
-  } // end of func delaunayTriangulate()
+  } // end of func delaunayTriangulateAndPopulateRenderArray()
   
-  func delaunaySubTriangulatePoints(vertexArray: [Vertex2DSimple], triangleRefArray: [TriangleRef]) {
-    
-    var subPointCloud2DMetal: [Vertex2DSimple] = vertexArray // initialize subPointCloud2DMetal array with passed vertices
-    // now append to subPointCloud2DMetal the vertices belonging to the passed triangleReferences
-    for triangleReference in triangleRefArray {
-      let v0 = pointCloud2DMetal[triangleReference.index0]
-      let v1 = pointCloud2DMetal[triangleReference.index1]
-      let v2 = pointCloud2DMetal[triangleReference.index2]
-      let vertexArray = [v0,v1,v2]
-      subPointCloud2DMetal.append(contentsOf: vertexArray) // append each triangle's vertices
-    } // end of for
-    
-    
-    // triangulate points in subPointCloud2DMetal
-    let subTriangleArrayRef = Delaunay().triangulate(vertices: subPointCloud2DMetal)
-    
-    print ("...[delaunaySubTriangulatePoint]: computed \(subTriangleArrayRef.count) triangles")
-    
-    for triangleReference in triangleRefArray {
-      if let index = delaunayTriangleRefArray.index(of: triangleReference) {
-        // before appending the new triangles to delaunayTriangleRefArray,  we want to remove the passed triangleReference triangles from it
-        // as they will be replaced by the subtriangles generated in the next step
-        delaunayTriangleRefArray.remove(at: index)
-        
-        // remove corresponding vertices from delaunayTriangleMeshOrderedVertices render array
-        // note that we remove in 'last in, first out' fashion
-        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 2))
-        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 1))
-        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 0))
-        
-      } // end of if let index
-    } // end of for triangleReference in triangleRefArray
-    
-    // add triangleRef's to master delaunayTriangleRefArray
-    for subTriangleReference in subTriangleArrayRef {
-      delaunayTriangleRefArray.append(subTriangleReference)
-    } // end of for
-    
-    // update delaunayTriangleMeshOrderedVertices with subTriangleArrayRef vertices
-    delaunayPopulateRenderArray(triangleRefArray: subTriangleArrayRef)
-    
-  } // end of func delaunaySubTriangulatePoints()
-  
-  func delaunaySubTriangulatePoint(vertex: Vertex2DSimple, triangleRefArray: [TriangleRef]) {
-    
-    for triangleReference in triangleRefArray {
-      let v0 = pointCloud2DMetal[triangleReference.index0]
-      let v1 = pointCloud2DMetal[triangleReference.index1]
-      let v2 = pointCloud2DMetal[triangleReference.index2]
-      let vertexArray = [v0,v1,v2]
-      
-      let subTriangleArrayRef = Delaunay().triangulateSimple(vertices: vertexArray, point: vertex)
-      
-      if let index = delaunayTriangleRefArray.index(of: triangleReference) {
-        // before appending the new triangles to delaunayTriangleRefArray,  we want to remove the passed triangleReference triangle from it
-        // as this containing triangle will be replaced by the subtriangles generated in the next step
-        delaunayTriangleRefArray.remove(at: index)
-        
-        // remove corresponding vertices from delaunayTriangleMeshOrderedVertices render array
-        // note that we remove in 'last in, first out' fashion
-        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 2))
-        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 1))
-        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 0))
-        
-      } // end of if let index
-      
-      // add triangleRef's to master delaunayTriangleRefArray
-      for subTriangleReference in subTriangleArrayRef {
-        delaunayTriangleRefArray.append(subTriangleReference)
-      } // end of for
-      
-      // update delaunayTriangleMeshOrderedVertices with subTriangleArrayRef vertices
-      delaunayPopulateRenderArray(triangleRefArray: subTriangleArrayRef)
-      
-    } // end of for triangleReference in triangleRefArray
-    
-  } // end of func delaunaySubTriangulatePoint
-  
-  func delaunaySubTriangulatePointOld2(vertex: Vertex2DSimple, triangleRefArray: [TriangleRef]) {
 
-    var subPointCloud2DMetal: [Vertex2DSimple] = [vertex] // initialize array with passed vertex
-    for triangleReference in triangleRefArray {
-      let v0 = pointCloud2DMetal[triangleReference.index0]
-      let v1 = pointCloud2DMetal[triangleReference.index1]
-      let v2 = pointCloud2DMetal[triangleReference.index2]
-      let vertexArray = [v0,v1,v2]
-      subPointCloud2DMetal.append(contentsOf: vertexArray) // append each triangle's vertices
-    } // end of for
-    
-    
-    // triangulate points in subPointCloud2DMetal
-    let subTriangleArrayRef = Delaunay().triangulate(vertices: subPointCloud2DMetal)
-    
-    print ("...[delaunaySubTriangulatePoint]: computed \(subTriangleArrayRef.count) triangles")
-    
-    for triangleReference in triangleRefArray {
-      if let index = delaunayTriangleRefArray.index(of: triangleReference) {
-        // before appending the new triangles to delaunayTriangleRefArray,  we want to remove the passed triangleReference triangle from it
-        // as this containing triangle will be replaced by the subtriangles generated in the next step
-        delaunayTriangleRefArray.remove(at: index)
-        
-        // remove corresponding vertices from delaunayTriangleMeshOrderedVertices render array
-        // note that we remove in 'last in, first out' fashion
-        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 2))
-        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 1))
-        delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 0))
-        
-      } // end of if let index
-    } // end of for triangleReference in triangleRefArray
-    
-    // add triangleRef's to master delaunayTriangleRefArray
-    for subTriangleReference in subTriangleArrayRef {
-      delaunayTriangleRefArray.append(subTriangleReference)
-    } // end of for
-    
-    // update delaunayTriangleMeshOrderedVertices with subTriangleArrayRef vertices
-    delaunayPopulateRenderArray(triangleRefArray: subTriangleArrayRef)
-
-  } // end of func delaunaySubTriangulatePoint()
-  
-  func delaunaySubTriangulatePointOld(vertex: Vertex2DSimple, triangleReference: TriangleRef) {
-    
-    // extract vertices from triangleRef
-    let v0 = pointCloud2DMetal[triangleReference.index0]
-    let v1 = pointCloud2DMetal[triangleReference.index1]
-    let v2 = pointCloud2DMetal[triangleReference.index2]
-    let subPointCloud2DMetal = [v0,v1,v2,vertex]
-
-    // triangulate points in subPointCloud2DMetal
-    let subTriangleArrayRef = Delaunay().triangulate(vertices: subPointCloud2DMetal)
-    print ("...[delaunaySubTriangulatePoint]: computed \(subTriangleArrayRef.count) triangles")
-    
-    if let index = delaunayTriangleRefArray.index(of: triangleReference) {
-      // before appending the new triangles to delaunayTriangleRefArray,  we want to remove the passed triangleReference triangle from it
-      // as this containing triangle will be replaced by the subtriangles generated in the next step
-      delaunayTriangleRefArray.remove(at: index)
-      
-      // remove corresponding vertices from delaunayTriangleMeshOrderedVertices render array
-      // note that we remove in 'last in, first out' fashion
-      delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 2))
-      delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 1))
-      delaunayTriangleMeshOrderedVertices.remove(at: (index * 3 + 0))
-      
-      // add triangleRef's to master delaunayTriangleRefArray
-      for triangleRef in subTriangleArrayRef {
-        delaunayTriangleRefArray.append(triangleRef)
-      } // end of for
-      
-      // update delaunayTriangleMeshOrderedVertices with subTriangleArrayRef vertices
-      delaunayPopulateRenderArray(triangleRefArray: subTriangleArrayRef)
-      
-    } // end of if let index
-
-  } // end of func delaunaySubTriangulatePoint()
-  
-  /*
-  func delaunayPopulateRenderArrayOld (vertexCloud2D: [Vertex2DSimple] ) {
-    //delaunayTriangleMeshOrderedVertices = [] // empty out ordered 3D array
-    //let delaunayTriangleReferences = Delaunay().triangulate(pointCloud2DMetal)
-    //delaunayTriangleRefArray = Delaunay().triangulate(vertices: vertexCloud2D)
-    print ("...about to draw \(delaunayTriangleRefArray.count) triangles")
-    //triangleCount = delaunayTriangleRefArray.count
-    for triangleRef in delaunayTriangleRefArray {
-      delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index0])
-      delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index1])
-      delaunayTriangleMeshOrderedVertices.append(pointCloud3DMetal[triangleRef.index2])
-    } // end of for
-  } // end of func delaunayPopulateRenderArray ()
-  */
-  /*
-  func delaunayPopulateRenderArrayOld () {
-    print ("...about to draw \(delaunayTriangleRefArray.count) triangles")
-    //triangleCount = delaunayTriangleRefArray.count
-    for triangleRef in delaunayTriangleRefArray {
-      delaunayTriangleMeshOrderedVertices.append(contentsOf: [
-        pointCloud3DMetal[triangleRef.index0],
-        pointCloud3DMetal[triangleRef.index1],
-        pointCloud3DMetal[triangleRef.index2]
-        ])
-    } // end of for
-  } // end of func delaunayPopulateRenderArray ()
-  */
   
   func delaunayPopulateRenderArray (triangleRefArray: [TriangleRef]) {
     //print ("...[delaunayPopulateRenderArray]: about to draw \(triangleRefArray.count) triangles")
