@@ -195,8 +195,7 @@ class DelaunayTriangulationMetalView: MTKView {
     let vertex2D = Vertex2DSimple(x: CGFloat(x0), y: CGFloat(y0), index: pointCloud2DMetal.count)
     let vertex3D = Vertex3DColor(x: x0, y: y0, z: 0.0, r: r0, g: g0, b: b0, a: a0)
     
-    /*
-    // append vertex to master 3D and 2D arrays ONLY if it's a new vertex
+    // append vertex to master 3D and 2D arrays ONLY if it's a new vertex.  We need this for stability of delaunay triangulations
     if pointCloud2DMetal.contains(vertex2D) {
       print ("...[vertexAppendToPointCloudArrays]: skipping already existing vertex")
       returnedVertex2D = Vertex2DSimple(x: CGFloat(x0), y: CGFloat(y0), index: -1) // if the pointCloud already has this vertex, we return a dummy one to throw away
@@ -205,12 +204,7 @@ class DelaunayTriangulationMetalView: MTKView {
       pointCloud2DMetal.append(vertex2D)
       returnedVertex2D = vertex2D
     }
-    //print ("...returned vertex2D: \(returnedVertex2D)")
-    */
-    pointCloud3DMetal.append(vertex3D)
-    pointCloud2DMetal.append(vertex2D)
-    returnedVertex2D = vertex2D
-    
+
     return returnedVertex2D
   } // end of func vertexAppend
   
